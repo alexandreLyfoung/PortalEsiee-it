@@ -4,13 +4,13 @@ from Class import Character
 
 class Portail(pygame.sprite.Sprite):
 
-    def __init__(self):
+    def __init__(self,imagepath):
 
         pygame.sprite.Sprite.__init__(self)
         self.__x = 0
         self.__y = 0
         self.__id_portail = -1
-        self.__image = pygame.image.load("images/portal.png").convert_alpha()
+        self.__image = pygame.image.load(imagepath).convert_alpha()
         self.rect = self.__image.get_rect()
         self.rect.center = (self.rect.width//2,self.rect.height//2)
     def get_x(self):

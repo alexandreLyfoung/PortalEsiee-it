@@ -10,11 +10,12 @@ class Player(pygame.sprite.Sprite):
         self.__speed = 5
         self.image = pygame.image.load("images/toad.png").convert_alpha()
         self.rect = self.image.get_rect()
+        self.rect.center = (self.rect.width // 2, self.rect.height // 2)
 
 
 
     def get_x(self):
-        return self.rect
+        return self.__x
     def set_x(self, x):
         self.__x += x
     def get_y(self):
