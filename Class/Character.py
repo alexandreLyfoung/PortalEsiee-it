@@ -14,7 +14,7 @@ class Player(pygame.sprite.Sprite):
 
 
     def get_x(self):
-        return self.__x
+        return self.rect
     def set_x(self, x):
         self.__x += x
     def get_y(self):
