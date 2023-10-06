@@ -33,3 +33,5 @@ class Player(pygame.sprite.Sprite):
         return self.rect.height
     def get_width(self):
         return self.rect.width
+    def get_rect(self):
+        return self.rect
