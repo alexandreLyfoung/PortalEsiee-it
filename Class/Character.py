@@ -1,5 +1,5 @@
 import pygame
-from main2 import load_sprite_sheets
+from main2 import load_sprite_sheets,SPRINT_KEY
 class Character(pygame.sprite.Sprite):
 
     COLOR = (255,0,0)
@@ -15,6 +15,7 @@ class Character(pygame.sprite.Sprite):
         self.direction = "left"
         self.animation_count = 0
         self.fall_count = 0
+        self.jump_count = 0
     def move(self, dx,dy):
 
         self.rect.x += dx
@@ -47,6 +48,15 @@ class Character(pygame.sprite.Sprite):
         self.count = 0
         self.y_speed *= -1
 
+    def jump(self):
+
+        self.y_speed = -self.GRAVITY * 8
+        self.animation_count = 0
+        self.jump_count += 1
+
+        if self.jump_count == 1:
+            self.fall_count = 0
+
     def loop(self, fps):
 
         self.y_speed += min(1, (self.fall_count/fps) * self.GRAVITY)
@@ -59,8 +69,18 @@ class Character(pygame.sprite.Sprite):
 
         sprite_sheet = "Idle"
 
-        if self.x_speed != 0:
+        if self.y_speed < 0:
+            if self.jump_count == 1:
+                sprite_sheet = "Jump"
+
+        elif self.y_speed > self.GRAVITY * 2:
+            sprite_sheet = "Fall"
+
+        elif self.x_speed != 0 and pygame.key.get_pressed()[SPRINT_KEY]:
             sprite_sheet = "Run"
+
+        elif self.x_speed != 0:
+            sprite_sheet = "Walk"
 
         sprite_sheet_name = sprite_sheet + "_" + self.direction
         sprites = self.SPRITES[sprite_sheet_name]
@@ -74,6 +94,6 @@ class Character(pygame.sprite.Sprite):
         self.rect = self.sprite.get_rect(topleft=(self.rect.x,self.rect.y))
         self.mask = pygame.mask.from_surface(self.sprite)
 
-    def draw(self,win):
+    def draw(self,win, offset_x):
 
-        win.blit(self.sprite, (self.rect.x,self.rect.y))
+        win.blit(self.sprite, (self.rect.x - offset_x,self.rect.y))
