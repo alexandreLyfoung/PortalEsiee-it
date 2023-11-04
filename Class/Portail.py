@@ -1,12 +1,10 @@
 import pygame
-import pygame.sprite
-from Class import Character
 
 class Portail(pygame.sprite.Sprite):
 
-    def __init__(self,imagepath):
+    def __init__(self,x,y,width,height,imagepath):
 
-        pygame.sprite.Sprite.__init__(self)
+        super().__init__()
         self.__x = 0
         self.__y = 0
         self.__id_portail = -1

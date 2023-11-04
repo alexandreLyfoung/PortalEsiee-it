@@ -19,6 +19,7 @@ PLAYER_SPEED = 5
 MOVE_KEY_LEFT = pygame.K_q
 MOVE_KEY_RIGHT = pygame.K_d
 JUMP_KEY = pygame.K_SPACE
+SPRINT_KEY = pygame.K_LSHIFT
 
 screen_size = (WIDTH, HEIGHT)
 pygame.display.set_caption("Portal")
@@ -78,15 +79,15 @@ def get_block(size):
 
     return pygame.transform.scale2x(surface)
 
-def draw(window,background,bg_img,player, objects):
+def draw(window,background,bg_img,player, objects, offset_x):
 
     for tile in background:
         window.blit(bg_img,tuple(tile))
 
     for obj in objects:
-        obj.draw(window_game)
+        obj.draw(window_game, offset_x)
 
-    player.draw(window)
+    player.draw(window ,offset_x)
 
     pygame.display.update()
 
@@ -108,15 +109,42 @@ def handle_vertical_collison(player, objects, dy):
 
     return collided_objects
 
+def collide(player, objects, dx):
+
+    player.move(dx, 0)
+    player.update()
+    collide_objects = None
+
+    for obj in objects:
+        if pygame.sprite.collide_mask(player, obj):
+
+            collide_objects = obj
+            break
+
+    player.move(-dx, 0)
+    player.update()
+
+    return collide_objects
+
+
 def handle_move(player, objects):
 
     keys = pygame.key.get_pressed()
 
     player.x_speed = 0
+    collide_left = collide(player,objects, -PLAYER_SPEED * 2)
+    collide_right = collide(player, objects, PLAYER_SPEED * 2)
 
-    if keys[MOVE_KEY_LEFT]:
+    if keys[MOVE_KEY_LEFT] and not collide_left and keys[SPRINT_KEY]:
+        player.move_left(PLAYER_SPEED + 2)
+
+    elif keys[MOVE_KEY_LEFT] and not collide_left:
         player.move_left(PLAYER_SPEED)
-    if keys[MOVE_KEY_RIGHT]:
+
+    if keys[MOVE_KEY_RIGHT] and not collide_right and keys[SPRINT_KEY]:
+        player.move_right(PLAYER_SPEED + 2)
+
+    elif keys[MOVE_KEY_RIGHT] and not collide_right:
         player.move_right(PLAYER_SPEED)
 
     handle_vertical_collison(player,objects,player.y_speed)
@@ -126,11 +154,24 @@ def main(window):
     clk = pygame.time.Clock()
     background, bg_img = get_background("Blue_Sky.png")
 
+
+
+
+
+
+
+
+
+
     block_size = 90
 
     player = Character.Character(100,100,50,50)
     floor = [Block.Block(i * block_size, HEIGHT - block_size, block_size) for i in range(-WIDTH // block_size,WIDTH * 2
                                                                                          // block_size)]
+    objects = [*floor, Block.Block(0,HEIGHT - block_size * 2, block_size)]
+    offset_x = 0
+    scroll_area_width = 200
+
     run = True
     while run:
         clk.tick(FPS)
@@ -141,9 +182,20 @@ def main(window):
                 run = False
                 break
 
+            if event.type == pygame.KEYDOWN:
+                if event.key == JUMP_KEY and player.jump_count < 1:
+
+                    player.jump()
+
         player.loop(FPS)
-        handle_move(player, floor)
-        draw(window_game,background, bg_img,player, floor)
+        handle_move(player, objects)
+        draw(window_game,background, bg_img,player, objects ,offset_x)
+
+        if (((player.rect.right - offset_x >= WIDTH - scroll_area_width) and player.x_speed > 0)
+                or ((player.rect.left - offset_x <= scroll_area_width) and player.x_speed < 0)):
+
+            offset_x += player.x_speed
+
 
     pygame.quit()
     quit()
