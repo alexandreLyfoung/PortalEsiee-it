@@ -1,38 +1,79 @@
-import pygame.sprite
-import os
+import pygame
+from main2 import load_sprite_sheets
+class Character(pygame.sprite.Sprite):
 
+    COLOR = (255,0,0)
+    GRAVITY = 1
+    SPRITES = load_sprite_sheets("players","Dude_Monster",32,32,True)
+    ANIMATION_DELAY = 6
+    def __init__(self,x,y,width,height):
+        super().__init__()
+        self.rect = pygame.Rect(x, y, width, height)
+        self.x_speed = 0
+        self.y_speed = 0
+        self.mask = None
+        self.direction = "left"
+        self.animation_count = 0
+        self.fall_count = 0
+    def move(self, dx,dy):
 
-class Player(pygame.sprite.Sprite):
-    def __init__(self):
-        pygame.sprite.Sprite.__init__(self)
-        self.__x = 0
-        self.__y = 0
-        self.__speed = 5
-        self.image = pygame.image.load("images/toad.png").convert_alpha()
-        self.rect = self.image.get_rect()
-        self.rect.center = (self.rect.width // 2, self.rect.height // 2)
+        self.rect.x += dx
+        self.rect.y += dy
 
+    def move_left(self,speed):
 
+        self.x_speed = -speed
 
-    def get_x(self):
-        return self.__x
-    def set_x(self, x):
-        self.__x += x
-    def get_y(self):
-        return self.__y
-    def set_y(self, y):
-        self.__y += y
-    def get_speed(self):
-        return self.__speed
-    def set_speed(self, speed):
-        self.__speed = speed
-    def get_charcter(self):
-        return self.__image
-    def set_character(self, character):
-        self.image = character
-    def get_height(self):
-        return self.rect.height
-    def get_width(self):
-        return self.rect.width
-    def get_rect(self):
-        return self.rect
+        if self.direction != "left":
+
+            self.direction = "left"
+            self.animation_count = 0
+    def move_right(self,speed):
+
+        self.x_speed = speed
+
+        if self.direction != "right":
+
+            self.direction = "right"
+            self.animation_count = 0
+
+    def landed(self):
+
+        self.fall_count = 0
+        self.y_speed = 0
+        self.jump_count = 0
+
+    def hit_head(self):
+        self.count = 0
+        self.y_speed *= -1
+
+    def loop(self, fps):
+
+        self.y_speed += min(1, (self.fall_count/fps) * self.GRAVITY)
+        self.move(self.x_speed,self.y_speed)
+
+        self.fall_count += 1
+        self.update_sprite()
+
+    def update_sprite(self):
+
+        sprite_sheet = "Idle"
+
+        if self.x_speed != 0:
+            sprite_sheet = "Run"
+
+        sprite_sheet_name = sprite_sheet + "_" + self.direction
+        sprites = self.SPRITES[sprite_sheet_name]
+        sprite_index = (self.animation_count // self.ANIMATION_DELAY) % len(sprites)
+        self.sprite = sprites[sprite_index]
+        self.animation_count += 1
+        self.update()
+
+    def update(self):
+
+        self.rect = self.sprite.get_rect(topleft=(self.rect.x,self.rect.y))
+        self.mask = pygame.mask.from_surface(self.sprite)
+
+    def draw(self,win):
+
+        win.blit(self.sprite, (self.rect.x,self.rect.y))

@@ -50,7 +50,7 @@ while True:
         character.rect.x = portal2.rect.x+100
         character.rect.y = portal2.rect.y
 
-    elif (character.rect.colliderect(portal2.rect)):ss
+    elif (character.rect.colliderect(portal2.rect)):
         character.rect.x = portal1.rect.x+100
         character.rect.y = portal1.rect.y
 
