@@ -50,7 +50,7 @@ class Character(pygame.sprite.Sprite):
 
     def jump(self):
 
-        self.y_speed = -self.GRAVITY * 8
+        self.y_speed = -self.GRAVITY * 2
         self.animation_count = 0
         self.jump_count += 1
 

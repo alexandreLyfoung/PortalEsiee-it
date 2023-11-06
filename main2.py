@@ -7,6 +7,7 @@ import math
 from os import listdir
 from os.path import isfile,join
 from Class import Character
+from Class import Terrain
 from Class import Block
 from Class import Portail
 
@@ -14,12 +15,13 @@ pygame.init()
 
 WIDTH, HEIGHT = 800,600
 FPS = 60
-PLAYER_SPEED = 5
+PLAYER_SPEED = 3
 
 MOVE_KEY_LEFT = pygame.K_q
 MOVE_KEY_RIGHT = pygame.K_d
 JUMP_KEY = pygame.K_SPACE
 SPRINT_KEY = pygame.K_LSHIFT
+#ATTACK_KEY = pygame.K_f
 
 screen_size = (WIDTH, HEIGHT)
 pygame.display.set_caption("Portal")
@@ -45,7 +47,7 @@ def load_sprite_sheets(dir1, dir2, width,height, direction=False):
             surface = pygame.Surface((width,height),pygame.SRCALPHA,32)
             rect = pygame.Rect(j * width, 0, width, height)
             surface.blit(sprite_sheet,(0,0),rect)
-            sprites.append(pygame.transform.scale2x(surface))
+            sprites.append(surface)
 
         if direction:
             all_sprites[image.replace(".png","") + "_right"] = sprites
@@ -79,15 +81,18 @@ def get_block(size):
 
     return pygame.transform.scale2x(surface)
 
-def draw(window,background,bg_img,player, objects, offset_x):
+def draw(window,background,bg_img,player, objects, offset_x,maps):
 
     for tile in background:
         window.blit(bg_img,tuple(tile))
 
     for obj in objects:
-        obj.draw(window_game, offset_x)
+        obj.draw(window_game,offset_x)
 
-    player.draw(window ,offset_x)
+    #for elem in maps:)
+    #    elem.draw_map(window_game)
+
+    player.draw(window,offset_x)
 
     pygame.display.update()
 
@@ -154,21 +159,22 @@ def main(window):
     clk = pygame.time.Clock()
     background, bg_img = get_background("Blue_Sky.png")
 
+    #map_foreground = Terrain.Terrain("./level/level1/level1_ForeGround.csv")
+    #map_background = Terrain.Terrain("./level/level1/level1_Background.csv")
+    #map_wall = Terrain.Terrain("./level/level1/level1_Wall.csv")
+    maps_bg = None
+    #maps_bg = [map_foreground] + [map_background]
+    #print(maps_bg)
 
-
-
-
-
-
-
-
-
-    block_size = 90
+    map = Terrain.Terrain("./level/lvl3.csv")
 
     player = Character.Character(100,100,50,50)
-    floor = [Block.Block(i * block_size, HEIGHT - block_size, block_size) for i in range(-WIDTH // block_size,WIDTH * 2
-                                                                                         // block_size)]
-    objects = [*floor, Block.Block(0,HEIGHT - block_size * 2, block_size)]
+    player.rect.x = map.start_x
+    player.rect.y = map.start_y
+
+    #objects = [*map_wall.tiles,*map_background.tiles,*map_wall.tiles]
+    objects = [*map.tiles]
+
     offset_x = 0
     scroll_area_width = 200
 
@@ -189,13 +195,20 @@ def main(window):
 
         player.loop(FPS)
         handle_move(player, objects)
-        draw(window_game,background, bg_img,player, objects ,offset_x)
+        draw(window_game,background, bg_img,player, objects ,offset_x,maps_bg)
 
         if (((player.rect.right - offset_x >= WIDTH - scroll_area_width) and player.x_speed > 0)
                 or ((player.rect.left - offset_x <= scroll_area_width) and player.x_speed < 0)):
 
             offset_x += player.x_speed
 
+        if (player.rect.colliderect(map.portals[0].rect)):
+            player.rect.x = map.portals[1].rect.x + 5
+            player.rect.y = map.portals[1].rect.y
+
+        elif (player.rect.colliderect(map.portals[1].rect)):
+            player.rect.x = map.portals[0].rect.x - 5
+            player.rect.y = map.portals[0].rect.y
 
     pygame.quit()
     quit()

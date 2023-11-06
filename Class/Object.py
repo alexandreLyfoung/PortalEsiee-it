@@ -1,5 +1,4 @@
 import pygame
-
 class Object(pygame.sprite.Sprite):
 
     def __init__(self,x ,y ,width, height, name=None):
@@ -14,4 +13,4 @@ class Object(pygame.sprite.Sprite):
     def draw(self,win, offset_x):
         win.blit(self.image, (self.rect.x - offset_x, self.rect.y))
 
-    
+
