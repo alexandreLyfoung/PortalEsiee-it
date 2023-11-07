@@ -184,7 +184,7 @@ def main(window):
 
     #CHARGEMENT DE LA MAP 1
 
-    map = Terrain.Terrain("./levels/level_test/level_test.csv")
+    map = Terrain.Terrain("./levels/level3/level3.csv")
 
     #INITIALISATION DU JOUEUR ET PLACEMENT SUR LA MAP LEVEL1 OU LEVEL_TEST
     player = Character.Character(100,100,50,50)
@@ -200,6 +200,9 @@ def main(window):
     offset_y = 0
     scroll_area_width = 200
     scroll_area_height = 200
+
+    #Mise a jour de la camera au lancement du jeu
+    offset_y = player.rect.y - player.y_speed - scroll_area_height
 
     #LOOP DU JEU
     run = True
@@ -230,14 +233,24 @@ def main(window):
 
         if (map.portals[0].is_collide(player)):
 
-            player.rect.x = map.portals[1].rect.x + 32
-            player.rect.y = map.portals[1].rect.y + 16
+            if player.direction == "right":
+                player.rect.x = map.portals[1].rect.x + 32
+                player.rect.y = map.portals[1].rect.y
+            else:
+                player.rect.x = map.portals[1].rect.x - 32
+                player.rect.y = map.portals[1].rect.y
+
             offset_y = player.rect.y - player.y_speed - scroll_area_height
 
         if(map.portals[1].is_collide(player)):
 
-            player.rect.x = map.portals[0].rect.x - 32
-            player.rect.y = map.portals[0].rect.y + 16
+            if player.direction == "right":
+                player.rect.x = map.portals[0].rect.x + 32
+                player.rect.y = map.portals[0].rect.y
+            else:
+                player.rect.x = map.portals[0].rect.x - 32
+                player.rect.y = map.portals[0].rect.y
+
             offset_y = player.rect.y - player.y_speed - scroll_area_height
 
         #TEST SI OBJECTIF COFFRE ATTEINT
