@@ -184,7 +184,7 @@ def main(window):
 
     #CHARGEMENT DE LA MAP 1
 
-    map = Terrain.Terrain("./levels/level3/level3.csv")
+    map = Terrain.Terrain("./levels/level2/level2.csv")
 
     #INITIALISATION DU JOUEUR ET PLACEMENT SUR LA MAP LEVEL1 OU LEVEL_TEST
     player = Character.Character(100,100,50,50)
