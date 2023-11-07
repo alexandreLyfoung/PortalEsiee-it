@@ -8,6 +8,7 @@ from Class import Terrain
 
 #INITIALISATION DE LA PYGAME
 pygame.init()
+pygame.font.init()
 
 #PARAMETRES DU JEU (IMPLEMENTATION D'UN MENU POSSIBLE)
 WIDTH, HEIGHT = 1200,720
@@ -24,7 +25,8 @@ SPRINT_KEY = pygame.K_LSHIFT
 #CREATION DE LA FENETRE DE JEU
 screen_size = (WIDTH, HEIGHT)
 pygame.display.set_caption("Portal")
-window_game = pygame.display.set_mode(screen_size)
+window_game = pygame.display.set_mode(screen_size, pygame.locals.RESIZABLE)
+myfont = pygame.font.Font(pygame.font.get_default_font(),40)
 
 #fonction permettant de flip une image pour les animations de sprites
 def flip(sprites):
@@ -88,12 +90,14 @@ def draw(window,background,bg_img,player, objects,offset_x,offset_y,map):
     for obj in objects:
         obj.draw(window_game,offset_x,offset_y)
 
+    #gestion affichage des objets en background
     for tile in map.background_obj:
         tile.draw(window_game,offset_x,offset_y)
 
-    for tile in map.chest:
-        tile.draw(window_game,offset_x,offset_y)
+    #gestion affichage du coffre
+    map.chest.draw(window_game,offset_x,offset_y)
 
+    #gestion affichage des portails
     for tile in map.portals:
         tile.draw(window_game,offset_x,offset_y)
 
@@ -222,17 +226,6 @@ def main(window):
         #AFFICHAGE DES ELEMENTS DU JEU
         draw(window_game,background, bg_img,player,objects,offset_x,offset_y,map)
 
-        #GESTION DE LA CAMERA DU JOUEUR ET TRACKING DE LA CAMERA SUR LE JOUEUR
-        if (((player.rect.right - offset_x >= WIDTH - scroll_area_width) and player.x_speed > 0)
-                or ((player.rect.left - offset_x <= scroll_area_width) and player.x_speed < 0)):
-
-            offset_x += player.x_speed
-
-        if (((player.rect.top - offset_y >= HEIGHT - scroll_area_height) and player.y_speed > 0)
-                or ((player.rect.bottom - offset_y <= scroll_area_height) and player.y_speed < 0)):
-
-            offset_y += player.y_speed
-
         #COLISION AVEC LES PORTAILS
 
         if (map.portals[0].is_collide(player)):
@@ -247,15 +240,19 @@ def main(window):
             player.rect.y = map.portals[0].rect.y + 16
             offset_y = player.rect.y - player.y_speed - scroll_area_height
 
-        # Collision avec le coffre (fin du niveau)
-        # On charge un nouveau niveau
-        if (map.chest[0].is_collide(player)):
-            map = Terrain.Terrain("./levels/lvl3.csv")
-            player.rect.x = map.start_x
-            player.rect.y = map.start_y
-            offset_y = player.rect.y - scroll_area_height
-            offset_x = player.rect.x - scroll_area_height
+        #TEST SI OBJECTIF COFFRE ATTEINT
+        if(map.chest.is_collide(player)):
+            win_text = myfont.render('Victoire',True, (0,0,0))
+            window.blit(win_text,(0,0))
 
+        # GESTION DE LA CAMERA DU JOUEUR ET TRACKING DE LA CAMERA SUR LE JOUEUR
+        if (((player.rect.right - offset_x >= WIDTH - scroll_area_width) and player.x_speed > 0)
+                or ((player.rect.left - offset_x <= scroll_area_width) and player.x_speed < 0)):
+            offset_x += player.x_speed
+
+        if (((player.rect.top - offset_y >= HEIGHT - scroll_area_height) and player.y_speed > 0)
+                or ((player.rect.bottom - offset_y <= scroll_area_height) and player.y_speed < 0)):
+            offset_y += player.y_speed
 
     pygame.quit()
     quit()
