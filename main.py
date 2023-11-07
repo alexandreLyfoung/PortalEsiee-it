@@ -24,7 +24,7 @@ SPRINT_KEY = pygame.K_LSHIFT
 #CREATION DE LA FENETRE DE JEU
 screen_size = (WIDTH, HEIGHT)
 pygame.display.set_caption("Portal")
-window_game = pygame.display.set_mode(screen_size, pygame.locals.RESIZABLE)
+window_game = pygame.display.set_mode(screen_size)
 
 #fonction permettant de flip une image pour les animations de sprites
 def flip(sprites):
@@ -246,6 +246,16 @@ def main(window):
             player.rect.x = map.portals[0].rect.x - 32
             player.rect.y = map.portals[0].rect.y + 16
             offset_y = player.rect.y - player.y_speed - scroll_area_height
+
+        # Collision avec le coffre (fin du niveau)
+        # On charge un nouveau niveau
+        if (map.chest[0].is_collide(player)):
+            map = Terrain.Terrain("./levels/lvl3.csv")
+            player.rect.x = map.start_x
+            player.rect.y = map.start_y
+            offset_y = player.rect.y - scroll_area_height
+            offset_x = player.rect.x - scroll_area_height
+
 
     pygame.quit()
     quit()
