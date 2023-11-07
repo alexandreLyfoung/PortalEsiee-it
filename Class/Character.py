@@ -1,5 +1,5 @@
 import pygame
-from main2 import load_sprite_sheets,SPRINT_KEY
+from main import load_sprite_sheets,SPRINT_KEY
 
 #Classe permettant la creation d'un joueur
 class Character(pygame.sprite.Sprite):
@@ -54,7 +54,7 @@ class Character(pygame.sprite.Sprite):
 
     def jump(self):
 
-        self.y_speed = -self.GRAVITY * 2
+        self.y_speed = -self.GRAVITY * 3
         self.animation_count = 0
         self.jump_count += 1
 
