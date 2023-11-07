@@ -2,19 +2,22 @@ import pygame
 import pygame.sprite
 import os, csv
 import main2
-from os.path import isfile,join
+from os.path import join
 from Class import Tile
-from Class import Portail
+#from Class import Portail
+
+#Classe permettant la creation de la tilesmaps
 class Terrain():
 
     def __init__(self,filepath):
 
-        self.tile_size = 16
-        self.start_x, self.start_y = 0, 0
-        self.tiles,self.portals = self.load_tiles(filepath)
-        self.map_surface = pygame.Surface((self.map_w, self.map_h))
-        self.map_surface.set_colorkey((0,0,0))
-        #self.load_map()
+        self.tile_size = 16   #taille des tuiles 16x16
+        self.start_x, self.start_y = 0, 0   #coordonne d'initilisation du joueur sur la map
+        self.tiles,self.portals = self.load_tiles(filepath) #chargement de la map
+
+    #lecture de la couche du niveau de la tilemaps depuis un fichier csv contenant les donnees de la map et
+    # traduire dans un tableau de valeurs contenant les ID's des sprites du spritesheet
+    # (creation de niveau a l'aide du logiciel Tiles)
     def read_csv(self, filepath):
 
         map = []
@@ -27,16 +30,13 @@ class Terrain():
 
         return map
 
-    def draw_map(self, surface):
+    #affichage des elements de la layer de la map
+    def draw_map(self, surface,offset_x,offset_y):
 
         for tile in self.tiles:
-            tile.draw(surface,0)
+            tile.draw(surface,offset_x,offset_y)
 
-    def load_map(self):
-
-        for tile in self.tiles:
-            tile.draw(self.map_surface,0)
-
+    #separation des textures de la map depuis un spritesheet contenant des tuiles 16x16
     def split_sprite_sheet(self,filename,sprite_width,sprite_height):
 
         spritesheet = pygame.image.load(join("images","terrains",filename))
@@ -69,6 +69,7 @@ class Terrain():
 
         return sprites
 
+    #Creation de la map pour le jeu et en associant les textures a leur ID's respectifs du csv
     def load_tiles(self,filepathcsv):
 
         all_sprites = self.split_sprite_sheet("spritesheet.png", self.tile_size, self.tile_size)
@@ -78,18 +79,28 @@ class Terrain():
 
         tiles = []
         portals = []
-        map = self.read_csv(filepathcsv)
+        layer_map = self.read_csv(filepathcsv)
         x,y = 0,0
         id_portal = 0
 
-        for row in map:
+        #Creation de la map ligne par ligne
+        for row in layer_map:
 
             x = 0
             for tile in row:
 
+                #Si detection de tile ID 3 (non utilise dans les objets ou elements du jeu) alors association coordonnee
+                #de ce tile sur la map a celui de la position initiale du joueur au lancement de la map
                 if tile == '3':
                     self.start_x, self.start_y = x * self.tile_size, main2.HEIGHT//2 + y * self.tile_size
-                elif tile == '0':
+                #sinon creation des autres elements du jeu en associant texture, dimension et coordonnee
+                else:
+                    rect = pygame.Rect(x * self.tile_size, y * self.tile_size, self.tile_size, self.tile_size)
+                    surface.blit(all_sprites[int(tile)], (0, 0), rect)
+                    tiles.append(Tile.Tile(all_sprites[int(tile)], x * self.tile_size,main2.HEIGHT//2
+                                           + y * self.tile_size,16))
+
+                """elif tile == '0':
                     rect = pygame.Rect(x * 16, y * 32, 16, 32)
                     surface.blit(portal1[0], (0, 0), rect)
                     portals.append(Portail.Portail(portal1[0], x * 16, y * 16,id_portal))
@@ -97,17 +108,11 @@ class Terrain():
                     rect = pygame.Rect(x * 16, y * 32, 16, 32)
                     surface.blit(portal2[0], (0, 0), rect)
                     portals.append(Portail.Portail(portal2[0], x * 16, y * 16,id_portal))
-                    id_portal+=1
-                else:
-                    rect = pygame.Rect(x * self.tile_size, y * self.tile_size, self.tile_size, self.tile_size)
-                    surface.blit(all_sprites[int(tile)], (0, 0), rect)
-                    tiles.append(Tile.Tile(all_sprites[int(tile)], x * self.tile_size,main2.HEIGHT//2 + y * self.tile_size,16))
+                    id_portal+=1"""
 
                 x += 1
 
             y += 1
-
-        self.map_w, self.map_h = x * self.tile_size, y * self.tile_size
 
         return tiles,portals
 

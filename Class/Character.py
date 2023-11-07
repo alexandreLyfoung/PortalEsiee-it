@@ -1,10 +1,14 @@
 import pygame
 from main2 import load_sprite_sheets,SPRINT_KEY
+
+#Classe permettant la creation d'un joueur
 class Character(pygame.sprite.Sprite):
 
-    COLOR = (255,0,0)
-    GRAVITY = 1
+    #Valeur de la gravite par defaut
+    GRAVITY = 2
+    #Importation du models de joueur
     SPRITES = load_sprite_sheets("players","Dude_Monster",32,32,True)
+    #Delai animation entre chaque sprite
     ANIMATION_DELAY = 6
     def __init__(self,x,y,width,height):
         super().__init__()
@@ -57,14 +61,16 @@ class Character(pygame.sprite.Sprite):
         if self.jump_count == 1:
             self.fall_count = 0
 
+    #Mise a jour chute et animations du joueur
     def loop(self, fps):
 
-        self.y_speed += min(1, (self.fall_count/fps) * self.GRAVITY)
+        self.y_speed += min(1,(self.fall_count/fps) * self.GRAVITY)
         self.move(self.x_speed,self.y_speed)
 
         self.fall_count += 1
         self.update_sprite()
 
+    #Mise a jour animation
     def update_sprite(self):
 
         sprite_sheet = "Idle"
@@ -89,11 +95,13 @@ class Character(pygame.sprite.Sprite):
         self.animation_count += 1
         self.update()
 
+    #Mise a jour de l'element joueur
     def update(self):
 
         self.rect = self.sprite.get_rect(topleft=(self.rect.x,self.rect.y))
         self.mask = pygame.mask.from_surface(self.sprite)
 
-    def draw(self,win, offset_x):
+    #Affichage du joueur
+    def draw(self,win, offset_x,offset_y):
 
-        win.blit(self.sprite, (self.rect.x - offset_x,self.rect.y))
+        win.blit(self.sprite, (self.rect.x - offset_x,self.rect.y - offset_y))

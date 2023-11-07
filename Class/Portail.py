@@ -1,10 +1,9 @@
 import pygame
 from Class import Object
-
 class Portail(Object):
     def __init__(self,image,x,y,id_portal):
 
-        #Object.Object(x,y,16,32)
+        super().__init__(x,y,16,32)
         self.portal_id = id_portal
         portal = image
         self.image.blit(portal, (0, 0))
