@@ -80,7 +80,7 @@ class Terrain():
 
         walls = []
         background_obj = []
-        chest = []
+        chest = None
         portals = []
         layer_map = self.read_csv(filepathcsv)
         x,y = 0,0
@@ -126,7 +126,7 @@ class Terrain():
                 elif (int_tile  == 82):
                     rect = pygame.Rect(x * self.tile_size, y * self.tile_size, self.tile_size, self.tile_size)
                     surface.blit(all_sprites[int(tile)], (0, 0), rect)
-                    chest.append(Chest.Chest(all_sprites[int(tile)], x * self.tile_size, main.HEIGHT // 2
+                    chest = (Chest.Chest(all_sprites[int(tile)], x * self.tile_size, main.HEIGHT // 2
                                            + y * self.tile_size, 16))
 
                 #sinon tous le reste sera considerer comme un background object
