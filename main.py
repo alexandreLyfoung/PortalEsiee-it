@@ -259,7 +259,7 @@ def main(window):
         #TEST SI OBJECTIF COFFRE ATTEINT
         if(map.chest.is_collide(player)):
             #AFFICHE LE MOT DE LA FIN LORSQUE LE DERNIER NIVEAU EST ATTEINT
-            if level == 2 :
+            if level == 3 :
                 text = "Victoire"
                 win_text = myfont.render(text, True, (255, 255, 255))
                 text_rect = win_text.get_rect()
@@ -267,15 +267,22 @@ def main(window):
                 window.blit(win_text, text_rect.center)
                 pygame.display.flip()
             # CHANGEMENT DE MAP AVANT LE DERNIER NIVEAU
-            else:
+            elif level == 1:
                 level+=1
-                map = Terrain.Terrain("./levels/level2/level2.csv")
+                map = Terrain.Terrain("levels/level2/level2.csv")
                 objects = [*map.walls]
                 player.rect.x = map.start_x
                 player.rect.y = map.start_y
                 offset_y = player.rect.y - player.y_speed - scroll_area_height
                 offset_x = player.rect.x - player.x_speed - scroll_area_height
-
+            elif level == 2:
+                level += 1
+                map = Terrain.Terrain("levels/level3/level3.csv")
+                objects = [*map.walls]
+                player.rect.x = map.start_x
+                player.rect.y = map.start_y
+                offset_y = player.rect.y - player.y_speed - scroll_area_height
+                offset_x = player.rect.x - player.x_speed - scroll_area_height
 
         # GESTION DE LA CAMERA DU JOUEUR ET TRACKING DE LA CAMERA SUR LE JOUEUR
         if (((player.rect.right - offset_x >= WIDTH - scroll_area_width) and player.x_speed > 0)
