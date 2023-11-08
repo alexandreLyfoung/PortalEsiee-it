@@ -11,7 +11,7 @@ pygame.init()
 pygame.font.init()
 
 #PARAMETRES DU JEU (IMPLEMENTATION D'UN MENU POSSIBLE)
-WIDTH, HEIGHT = 1200,720
+WIDTH, HEIGHT = 800,600
 FPS = 60
 PLAYER_SPEED = 3
 
@@ -25,7 +25,7 @@ SPRINT_KEY = pygame.K_LSHIFT
 #CREATION DE LA FENETRE DE JEU
 screen_size = (WIDTH, HEIGHT)
 pygame.display.set_caption("Portal")
-window_game = pygame.display.set_mode(screen_size, pygame.locals.RESIZABLE)
+window_game = pygame.display.set_mode(screen_size)
 myfont = pygame.font.Font(pygame.font.get_default_font(),40)
 
 #fonction permettant de flip une image pour les animations de sprites
@@ -184,7 +184,10 @@ def main(window):
 
     #CHARGEMENT DE LA MAP 1
 
-    map = Terrain.Terrain("./levels/level2/level2.csv")
+    map = Terrain.Terrain("./levels/level1/level1.csv")
+
+    #NUMERO DU LEVEL
+    level = 1
 
     #INITIALISATION DU JOUEUR ET PLACEMENT SUR LA MAP LEVEL1 OU LEVEL_TEST
     player = Character.Character(100,100,50,50)
@@ -255,8 +258,24 @@ def main(window):
 
         #TEST SI OBJECTIF COFFRE ATTEINT
         if(map.chest.is_collide(player)):
-            win_text = myfont.render('Victoire',True, (0,0,0))
-            window.blit(win_text,(0,0))
+            #AFFICHE LE MOT DE LA FIN LORSQUE LE DERNIER NIVEAU EST ATTEINT
+            if level == 2 :
+                text = "Victoire"
+                win_text = myfont.render(text, True, (255, 255, 255))
+                text_rect = win_text.get_rect()
+                text_rect.center = (WIDTH // 2, HEIGHT // 2)
+                window.blit(win_text, text_rect.center)
+                pygame.display.flip()
+            # CHANGEMENT DE MAP AVANT LE DERNIER NIVEAU
+            else:
+                level+=1
+                map = Terrain.Terrain("./levels/level2/level2.csv")
+                objects = [*map.walls]
+                player.rect.x = map.start_x
+                player.rect.y = map.start_y
+                offset_y = player.rect.y - player.y_speed - scroll_area_height
+                offset_x = player.rect.x - player.x_speed - scroll_area_height
+
 
         # GESTION DE LA CAMERA DU JOUEUR ET TRACKING DE LA CAMERA SUR LE JOUEUR
         if (((player.rect.right - offset_x >= WIDTH - scroll_area_width) and player.x_speed > 0)
